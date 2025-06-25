@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Universal Social Media Downloader</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Universal Downloader</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * {
@@ -31,6 +31,11 @@
       font-size: 2.5rem;
       margin: 0;
       color: #38bdf8;
+    }
+
+    header p {
+      color: #94a3b8;
+      margin-top: 0.5rem;
     }
 
     form {
@@ -71,14 +76,25 @@
     }
 
     #result {
-      white-space: pre-wrap;
       background: #1e293b;
-      padding: 1rem;
-      border-radius: 8px;
+      padding: 2rem;
+      border-radius: 10px;
       width: 90%;
       max-width: 600px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       overflow-x: auto;
+    }
+
+    .download-button {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #22c55e;
+      color: #fff;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      display: inline-block;
     }
 
     footer {
@@ -86,6 +102,13 @@
       padding: 1rem;
       color: #94a3b8;
       font-size: 0.9rem;
+      text-align: center;
+    }
+
+    img.preview {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-bottom: 1rem;
     }
   </style>
 </head>
@@ -93,7 +116,7 @@
 
   <header>
     <h1>📥 Universal Downloader</h1>
-    <p>Download videos from YouTube, Instagram, TikTok, Facebook, Twitter, and more</p>
+    <p>Download videos from YouTube, Instagram, TikTok, Facebook, X and more!</p>
   </header>
 
   <form id="downloadForm">
@@ -104,7 +127,7 @@
   <div id="result"></div>
 
   <footer>
-    &copy; 2025 mdimran.py | Made with ❤️ for social media lovers
+    &copy; 2025 mdimran.py | Built with ❤️ using Flask + Render
   </footer>
 
   <script>
@@ -113,7 +136,7 @@
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      resultDiv.textContent = 'Downloading... please wait.';
+      resultDiv.innerHTML = '<p>🔄 Processing... Please wait.</p>';
 
       const url = document.getElementById('urlInput').value;
 
@@ -125,9 +148,20 @@
         });
 
         const data = await res.json();
-        resultDiv.textContent = JSON.stringify(data, null, 2);
+
+        if (data.status === 'success' && data.download_url) {
+          resultDiv.innerHTML = `
+            <h3>✅ ${data.title || 'Untitled Video'}</h3>
+            <p><strong>Platform:</strong> ${data.platform}</p>
+            <p><strong>Type:</strong> ${data.type}</p>
+            <a href="${data.download_url}" class="download-button" download>⬇ Download Now</a>
+          `;
+        } else {
+          resultDiv.innerHTML = `<p style="color: red;">❌ ${data.message}</p>`;
+        }
+
       } catch (err) {
-        resultDiv.textContent = 'Error: ' + err.message;
+        resultDiv.innerHTML = `<p style="color: red;">❌ Error: ${err.message}</p>`;
       }
     });
   </script>
